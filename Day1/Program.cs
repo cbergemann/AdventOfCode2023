@@ -53,7 +53,9 @@ void PartTwo()
 
             digits.Add(digit);
 
-            pos += match.Length;
+            pos = match.Index + 1;
+            // pos += match.Length;
+
             match = digitsWithLetters.Match(line, pos);
         }
 
