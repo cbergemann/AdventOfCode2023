@@ -21,7 +21,13 @@ void Solution(bool allowJokers)
     
     for (var it = 0; it < hands.Count; it++)
     {
-        winnings += (it + 1) * hands[it].Bet;
+        var hand = hands[it];
+        // if (hand.Hand.ToString().Contains("J"))
+        // {
+        //     Console.WriteLine($"Hand: {hand.Hand}: {hand.Hand.TypeOfHand}");
+        // }
+        
+        winnings += (it + 1) * hand.Bet;
     }
 
     Console.WriteLine($"total winnings: {winnings} ({(allowJokers ? "with" : "without")} jokers)");

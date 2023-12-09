@@ -1,8 +1,5 @@
-﻿using System.Diagnostics;
+﻿namespace Day7;
 
-namespace Day7;
-
-[DebuggerDisplay("Hand({_hand})")]
 public class Hand : IComparable<Hand>
 {
     private readonly string _hand;
@@ -16,9 +13,11 @@ public class Hand : IComparable<Hand>
         TypeOfHand = DetermineTypeOfHand(Cards);
     }
 
-    private Card[] Cards { get; }
+    public override string ToString() => _hand;
+
+    public Card[] Cards { get; }
     
-    private TypeOfHand TypeOfHand { get; }
+    public TypeOfHand TypeOfHand { get; }
 
     private Card DetermineCard(char c)
     {
@@ -74,12 +73,27 @@ public class Hand : IComparable<Hand>
             return TypeOfHand.FullHouse;
         }
 
-        if (cardCount.Values.Any(v => v == 3))
+        if (cardCount.Values.Any(v => v == 3)
+            || (cardCount.Values.Any(v => v == 2) && jokerCount > 0)
+            || (cardCount.Values.Any(v => v == 1) && jokerCount > 1))
         {
             return TypeOfHand.ThreeOfAKind;
         }
 
-        var pairCount = cardCount.Values.Count(c => c == 2);
+        var pairCount = 0;
+        foreach (var count in cardCount)
+        {
+            if (count.Value == 2)
+            {
+                pairCount++;
+            }
+            else if (count.Value == 1 && jokerCount > 0)
+            {
+                jokerCount--;
+                pairCount++;
+            }
+        }
+        
         return pairCount switch
         {
             2 => TypeOfHand.TwoPair,
