@@ -2,6 +2,20 @@
 
 using Day5;
 
+long GetLocation(long seed, Dictionary<string, Mapping> mappings)
+{
+    var currentType = "seed";
+    var value = seed;
+    while (currentType != "location")
+    {
+        var map = mappings[currentType];
+        currentType = map.DestinationName;
+        value = map[value];
+    }
+
+    return value;
+}
+
 void PartOne()
 {
     var initalSeeds = new List<long>();
@@ -23,24 +37,53 @@ void PartOne()
             mappings.Add(mapping.SourceName, mapping);
         }
     }
+    
+    var closestSeedLocation = initalSeeds.Min(s => GetLocation(s, mappings));
+    
+    Console.WriteLine($"the closest seed location is: {closestSeedLocation}");
+}
 
-    long GetLocation(long seed)
+void PartTwo()
+{
+    var initalSeeds = new List<(long, int)>();
+    var mappings = new Dictionary<string, Mapping>();
+    
+    var lines = new Queue<string>(File.ReadAllLines("input.txt"));
+    while (lines.TryDequeue(out var line))
     {
-        var currentType = "seed";
-        var value = seed;
-        while (currentType != "location")
+        if (line.StartsWith("seeds: "))
         {
-            var map = mappings[currentType];
-            currentType = map.DestinationName;
-            value = map[value];
+            var seedRangeValues = line.Substring(7).Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(long.Parse)
+                .ToArray();
+
+            initalSeeds.AddRange(seedRangeValues.Chunk(2).Select(seedRange => (seedRange[0], (int)seedRange[1])));
+            // initalSeeds.AddRange(seedRangeValues.Chunk(2).Select(seedRange => (seedRange[0], 1000000)));
+
+            continue;
         }
 
-        return value;
+        if (line.EndsWith(" map:"))
+        {
+            var mapping = new Mapping(line, lines);
+            mappings.Add(mapping.SourceName, mapping);
+        }
     }
 
-    var closestSeedLocation = initalSeeds.Min(GetLocation);
+    var closestSeedLocation = long.MaxValue;
+
+    foreach (var seedRange in initalSeeds)
+    {
+        Console.WriteLine($"looking at range {seedRange.Item1}...{seedRange.Item1+seedRange.Item2}...");
+        
+        var closestLocation = Enumerable.Range(0, seedRange.Item2).Min(s => GetLocation(seedRange.Item1 + s, mappings));
+        if (closestLocation < closestSeedLocation)
+        {
+            closestSeedLocation = closestLocation;
+        }
+    }
     
     Console.WriteLine($"the closest seed location is: {closestSeedLocation}");
 }
 
 PartOne();
+PartTwo();
