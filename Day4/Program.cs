@@ -1,32 +1,35 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using Day4;
+
 void PartOne()
 {
-    var sum = 0L;
-
-    var lines = File.ReadAllLines("input.txt");
-    foreach (var line in lines)
-    {
-        var split1 = line.Split(':');
-        // var split2 = split1[0].Split(' ');
-        // var cardId = int.Parse(split2[0]);
-
-        var split2 = split1[1].Split('|');
-        var winningNumbers = split2[0].Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToHashSet();
-        var drawnNumbers = split2[1].Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
-        winningNumbers.IntersectWith(drawnNumbers);
-
-        if (winningNumbers.Count > 0)
-        {
-            var points = (long)Math.Pow(2, winningNumbers.Count - 1);
-            // Console.WriteLine($"{split1[0]}: {points}");
-            sum += points;
-        }
-    }
+    var cards = File.ReadAllLines("input.txt").Select(line => new ScratchCard(line));
+    var sum = cards.Sum(c => c.Points);
 
     Console.WriteLine($"Ticket points total: {sum}");
 }
 
-PartOne();
+void PartTwo()
+{
+    var sum = 0L;
 
+    var cards = File.ReadAllLines("input.txt").Select(line => new ScratchCard(line)).ToArray();
+
+    var cardStack = new Queue<ScratchCard>(cards);
+    while (cardStack.TryDequeue(out var card))
+    {
+        sum++;
+        
+        for (var it = 0; it < card.Count; it++)
+        {
+            cardStack.Enqueue(cards[card.CardId + it]);
+        }
+    }
+
+    Console.WriteLine($"Total number of cards: {sum}");
+}
+
+PartOne();
+PartTwo();
 
