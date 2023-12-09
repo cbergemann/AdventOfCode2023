@@ -1,6 +1,6 @@
 ﻿using Day7;
 
-void PartOne()
+void Solution(bool allowJokers)
 {
     var hands = new List<(Hand Hand, int Bet)>(); 
     
@@ -8,7 +8,7 @@ void PartOne()
     foreach (var line in lines)
     {
         var split = line.Split(' ');
-        var hand = new Hand(split[0]);
+        var hand = new Hand(split[0], allowJokers);
         var bet = int.Parse(split[1]);
 
         hands.Add((hand, bet));
@@ -24,7 +24,8 @@ void PartOne()
         winnings += (it + 1) * hands[it].Bet;
     }
 
-    Console.WriteLine($"total winnings: {winnings}");
+    Console.WriteLine($"total winnings: {winnings} ({(allowJokers ? "with" : "without")} jokers)");
 }
 
-PartOne();
+Solution(allowJokers: false);
+Solution(allowJokers: true);

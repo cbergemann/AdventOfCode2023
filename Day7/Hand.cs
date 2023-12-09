@@ -6,10 +6,12 @@ namespace Day7;
 public class Hand : IComparable<Hand>
 {
     private readonly string _hand;
+    private readonly bool _allowJokers;
 
-    public Hand(string hand)
+    public Hand(string hand, bool allowJokers)
     {
         _hand = hand;
+        _allowJokers = allowJokers;
         Cards = hand.Select(DetermineCard).ToArray();
         TypeOfHand = DetermineTypeOfHand(Cards);
     }
@@ -22,35 +24,42 @@ public class Hand : IComparable<Hand>
     {
         return c switch
         {
-            'A' => Card.A,
-            'K' => Card.K,
-            'Q' => Card.Q,
-            'J' => Card.J,
-            'T' => Card.T,
-            '9' => Card._9,
-            '8' => Card._8,
-            '7' => Card._7,
-            '6' => Card._6,
-            '5' => Card._5,
-            '4' => Card._4,
-            '3' => Card._3,
-            '2' => Card._2,
+            'A' => Card.Ace,
+            'K' => Card.King,
+            'Q' => Card.Queen,
+            'J' => _allowJokers ? Card.Joker : Card.Jack,
+            'T' => Card.Ten,
+            '9' => Card.Nine,
+            '8' => Card.Eight,
+            '7' => Card.Seven,
+            '6' => Card.Six,
+            '5' => Card.Five,
+            '4' => Card.Four,
+            '3' => Card.Three,
+            '2' => Card.Two,
             _ => throw new Exception(),
         };
     }
 
     private TypeOfHand DetermineTypeOfHand(IEnumerable<Card> cards)
     {
+        var jokerCount = 0;
         var cardCount = new Dictionary<Card, int>();
         foreach (var card in cards)
         {
+            if (card == Card.Joker)
+            {
+                jokerCount++;
+                continue;
+            }
+            
             if (!cardCount.TryAdd(card, 1))
             {
                 cardCount[card] += 1;
             }
         }
 
-        if (cardCount.Count == 1)
+        if (cardCount.Count <= 1)
         {
             return TypeOfHand.FiveOfAKind;
         }
