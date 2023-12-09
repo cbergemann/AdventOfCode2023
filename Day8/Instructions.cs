@@ -19,6 +19,12 @@ public class Instructions
         }
     }
 
+    public Instructions(Instructions instructions)
+    {
+        _instructions = instructions._instructions;
+        _positionPointer = instructions._positionPointer;
+    }
+
     public Instruction Next()
     {
         var instruction = _instructions[_positionPointer++];

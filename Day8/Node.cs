@@ -18,4 +18,8 @@ public readonly struct Node(string name, string leftBranch, string rightBranch)
     public string LeftBranch { get; } = leftBranch;
 
     public string RightBranch { get; } = rightBranch;
+
+    public bool IsStartNode => Name.EndsWith("A");
+
+    public bool IsEndNode => Name.EndsWith("Z");
 }
