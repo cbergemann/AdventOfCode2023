@@ -9,6 +9,7 @@ public enum PipeType
     South = 4,
     West = 8,
     Start = 16,
+    PartOfLoop = 32,
     NorthSouth = North | South,
     EastWest = East | West,
     NorthEast = North | East,

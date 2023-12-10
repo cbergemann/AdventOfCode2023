@@ -51,6 +51,52 @@ public class PipeNetwork
 
     private Position PreviousPosition { get; set; }
 
+    public int CalculateArea()
+    {
+        var area = 0;
+        
+        for (var row = 0; row < _layout.GetLength(0); row++)
+        {
+            var north = false;
+            var south = false;
+            var inside = false;
+            
+            for (var col = 0; col < _layout.GetLength(1); col++)
+            {
+                var partOfLoop = (_layout[row, col] & PipeType.PartOfLoop) != 0;
+                if (partOfLoop)
+                {
+                    var pipe = _layout[row, col];
+                    if ((pipe & PipeType.North) != 0)
+                    {
+                        north = !north;
+                    }
+                    
+                    if ((pipe & PipeType.South) != 0)
+                    {
+                        south = !south;
+                    }
+                }
+
+                if (north && south)
+                {
+                    inside = true;
+                }
+                else if (!north && !south)
+                {
+                    inside = false;
+                }
+
+                if (!partOfLoop && inside)
+                {
+                    area++;
+                }
+            }
+        }
+
+        return area;
+    }
+
     public void Step()
     {
         var previousPosition = PreviousPosition;
@@ -65,28 +111,25 @@ public class PipeNetwork
         if ((currentPipe & PipeType.North) != 0 && previousPosition != northPosition)
         {
             CurrentPosition = northPosition;
-            return;
         }
-        
-        if ((currentPipe & PipeType.East) != 0 && previousPosition != eastPosition)
+        else if ((currentPipe & PipeType.East) != 0 && previousPosition != eastPosition)
         {
             CurrentPosition = eastPosition;
-            return;
         }
-
-        if ((currentPipe & PipeType.South) != 0 && previousPosition != southPosition)
+        else if ((currentPipe & PipeType.South) != 0 && previousPosition != southPosition)
         {
             CurrentPosition = southPosition;
-            return;
         }
-
-        if ((currentPipe & PipeType.West) != 0 && previousPosition != westPosition)
+        else if ((currentPipe & PipeType.West) != 0 && previousPosition != westPosition)
         {
             CurrentPosition = westPosition;
-            return;
         }
-
-        throw new Exception("stuck");
+        else
+        {
+            throw new Exception("stuck");
+        }
+        
+        _layout[CurrentPosition.Row, CurrentPosition.Col] |= PipeType.PartOfLoop;
     }
 
     private PipeType this[Position position] => this[position.Row, position.Col];
@@ -106,7 +149,7 @@ public class PipeNetwork
 
     private PipeType DetermineStartPipe()
     {
-        var startPipe = PipeType.Ground;
+        var startPipe = PipeType.PartOfLoop;
         var northPosition = Start with { Row = Start.Row - 1 };
         var eastPosition = Start with { Col = Start.Col + 1 };
         var southPosition = Start with { Row = Start.Row + 1 };

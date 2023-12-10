@@ -1,6 +1,6 @@
 ﻿using Day10;
 
-void PartOne()
+void Solution()
 {
     var lines = File.ReadAllLines("input.txt");
 
@@ -16,6 +16,7 @@ void PartOne()
     }
     
     Console.WriteLine($"steps to farthest location: {steps / 2L} ({steps})");
+    Console.WriteLine($"area enclosed: {network.CalculateArea()}");
 }
 
-PartOne();
+Solution();
