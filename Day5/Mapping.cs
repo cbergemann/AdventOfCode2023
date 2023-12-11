@@ -34,6 +34,42 @@ public class Mapping
     
     public string DestinationName { get; }
 
+    public IEnumerable<(long Start, long End)> this[(long Start, long End) value]
+    {
+        get
+        {
+            var range = value;
+
+            while (true)
+            {
+                foreach (var (destinationRageStart, sourceRangeStart, rangeSize) in _entries)
+                {
+                    if (range.Start >= sourceRangeStart && range.Start < sourceRangeStart + rangeSize)
+                    {
+                        var subrangeSize = range.End - range.Start;
+                        var available = sourceRangeStart + rangeSize - range.Start;
+                        if (available >= subrangeSize)
+                        {
+                            yield return (destinationRageStart + range.Start - sourceRangeStart, subrangeSize);
+                            range = range with { Start = range.End };
+                            break;
+                        }
+                        else
+                        {
+                            yield return (destinationRageStart + range.Start - sourceRangeStart, available);
+                            range = range with { Start = range.Start + available };
+                        }
+                    }
+                }
+
+                if (range.Start == range.End)
+                {
+                    yield break;
+                }
+            }
+        }
+    }
+
     public long this[long value]
     {
         get

@@ -2,6 +2,21 @@
 
 using Day5;
 
+long GetRangeMinLocation((long, long) seedRange, Dictionary<string, Mapping> mappings)
+{
+    var currentType = "seed";
+    var value = new [] { seedRange }.AsEnumerable();
+    while (currentType != "location")
+    {
+        var map = mappings[currentType];
+        currentType = map.DestinationName;
+
+        value = value.SelectMany(v => map[v]);
+    }
+
+    return value.Min(v => v.Item1);
+}
+
 long GetLocation(long seed, Dictionary<string, Mapping> mappings)
 {
     var currentType = "seed";
@@ -74,8 +89,8 @@ void PartTwo()
     foreach (var seedRange in initalSeeds)
     {
         Console.WriteLine($"looking at range {seedRange.Item1}...{seedRange.Item1+seedRange.Item2}...");
-        
-        var closestLocation = Enumerable.Range(0, seedRange.Item2).Min(s => GetLocation(seedRange.Item1 + s, mappings));
+
+        var closestLocation = GetRangeMinLocation((seedRange.Item1, seedRange.Item1 + seedRange.Item2), mappings);
         if (closestLocation < closestSeedLocation)
         {
             closestSeedLocation = closestLocation;
